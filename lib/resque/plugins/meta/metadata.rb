@@ -44,7 +44,7 @@ module Resque
         end
 
         def start!
-          @started_at = Time.now
+          @started_at = (Time.respond_to? :real_now) ? Time.real_now : Time.now
           self['started_at'] = to_time_format_str(@started_at)
           save
         end
@@ -55,7 +55,7 @@ module Resque
 
         def finish!
           data['succeeded'] = true unless data.has_key?('succeeded')
-          @finished_at = Time.now
+          @finished_at = (Time.respond_to? :real_now) ? Time.real_now : Time.now
           self['finished_at'] = to_time_format_str(@finished_at)
           save
         end
@@ -107,12 +107,12 @@ module Resque
         end
 
         def seconds_enqueued
-          (started_at || Time.now).to_f - enqueued_at.to_f
+          (started_at || (Time.respond_to? :real_now) ? Time.real_now : Time.now).to_f - enqueued_at.to_f
         end
 
         def seconds_processing
           if started?
-            (finished_at || Time.now).to_f - started_at.to_f
+            (finished_at || (Time.respond_to? :real_now) ? Time.real_now : Time.now).to_f - started_at.to_f
           else
             0
           end
