@@ -7,7 +7,7 @@ module Resque
         attr_reader :job_class, :meta_id, :data, :enqueued_at, :expire_in, :before_finish_expire_in
 
         def initialize(data_hash)
-          data_hash['enqueued_at'] ||= to_time_format_str(Time.now)
+          data_hash['enqueued_at'] ||= to_time_format_str((Time.respond_to? :real_now) ? Time.real_now : Time.now)
           @data = data_hash
           @meta_id = data_hash['meta_id'].dup
           @enqueued_at = from_time_format_str('enqueued_at')

@@ -37,7 +37,7 @@ module Resque
       # passed the same arguments as `perform`, that is, your job's
       # payload.
       def meta_id(*args)
-        Digest::SHA1.hexdigest([ Time.now.to_f, rand, self, args ].join)
+        Digest::SHA1.hexdigest([ ((Time.respond_to? :real_now) ? Time.real_now : Time.now).to_f, rand, self, args ].join)
       end
 
       # Override in your job to control the how many seconds a job's
@@ -72,7 +72,7 @@ module Resque
         key = "meta:#{meta.meta_id}"
         json = Resque.encode(meta.data)
         if meta.expire_at > 0
-          Resque.redis.setex(key, meta.expire_at - Time.now.to_i, json)
+          Resque.redis.setex(key, meta.expire_at - ((Time.respond_to? :real_now) ? Time.real_now : Time.now).to_i, json)
         else
           Resque.redis.set(key, json)
         end
